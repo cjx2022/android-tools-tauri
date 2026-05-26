@@ -1,6 +1,6 @@
 [package]
 name = "android-tools"
-version = "1.5.0"
+version = "1.5.1"
 description = "安卓工具集 - Tauri版"
 authors = ["AndroidTools"]
 edition = "2021"

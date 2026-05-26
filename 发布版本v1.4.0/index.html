@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>安卓工具集 v1.5.0</title>
+    <title>安卓工具集 v1.4.0</title>
     <style>
         * {
             margin: 0;
@@ -1321,18 +1321,19 @@
     <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙 深色</button>
 
     <div class="container">
-        <h1>安卓工具集 v1.5.0</h1>
+        <h1>安卓工具集 v1.4.0</h1>
 
         <!-- Quick Actions -->
         <div class="quick-actions">
             <button onclick="collapseAllPanels()">📁 折叠全部</button>
         </div>
 
-        <!-- Network Connection Section -->
+        <!-- ADB Path Section -->
         <div class="adb-section">
             <div class="adb-row">
-                <label>ADB状态:</label>
-                <span id="adbPath" class="adb-path set">已就绪（内嵌ADB）</span>
+                <label>ADB路径:</label>
+                <span id="adbPath" class="adb-path error">未找到ADB，请手动设置</span>
+                <button onclick="setAdbPath()">手动设置ADB</button>
             </div>
             <div class="adb-row">
                 <label>网络连接:</label>
@@ -1357,7 +1358,7 @@
             <table class="device-table">
                 <thead>
                     <tr>
-                        <th class="checkbox-cell"><input type="checkbox" id="selectAllCheckbox" onclick="toggleSelectAll()" /></th>
+                        <th class="checkbox-cell">选择</th>
                         <th>设备ID</th>
                         <th>状态</th>
                         <th>型号</th>
@@ -1378,7 +1379,7 @@
         <!-- APK Install Panel -->
         <div class="panel apk-panel" id="panel-apk">
             <div class="panel-header" onclick="togglePanel('panel-apk')">
-                <div class="panel-title">📦 APK批量安装和卸载</div>
+                <div class="panel-title">APK批量安装和卸载</div>
                 <button class="panel-toggle">▼</button>
             </div>
             <div class="panel-content">
@@ -1425,7 +1426,7 @@
         <!-- Control Panel -->
         <div class="panel" id="panel-control">
             <div class="panel-header" onclick="togglePanel('panel-control')">
-                <div class="panel-title">🎛️ 显示控制（仅适用于安卓10及以下）</div>
+                <div class="panel-title">显示控制（仅适用于安卓10及以下）</div>
                 <button class="panel-toggle">▼</button>
             </div>
             <div class="panel-content">
@@ -1460,7 +1461,7 @@
         <!-- File Manager Section -->
         <div class="panel file-manager-panel" id="panel-file">
             <div class="panel-header" onclick="togglePanel('panel-file')">
-                <div class="panel-title">📁 文件管理</div>
+                <div class="panel-title">文件管理</div>
                 <button class="panel-toggle">▼</button>
             </div>
             <div class="panel-content">
@@ -1516,7 +1517,7 @@
         <!-- Batch Delete Section -->
         <div class="panel batch-delete-panel" id="panel-delete">
             <div class="panel-header" onclick="togglePanel('panel-delete')">
-                <div class="panel-title">🗑️ 批量删除</div>
+                <div class="panel-title">批量删除</div>
                 <button class="panel-toggle">▼</button>
             </div>
             <div class="panel-content">
@@ -1555,10 +1556,31 @@
             </div>
         </div>
 
+        <!-- ADB Command Terminal Section -->
+        <div class="panel adb-terminal-panel" id="panel-terminal">
+            <div class="panel-header" onclick="togglePanel('panel-terminal')">
+                <div class="panel-title">🔧 ADB 命令行（需选择一台设备）</div>
+                <button class="panel-toggle">▼</button>
+            </div>
+            <div class="panel-content">
+                <div class="terminal-container">
+                    <div class="terminal-output" id="terminalOutput">
+                        <div class="terminal-line system">欢迎使用 ADB 命令行 - 选择设备后输入命令执行</div>
+                    </div>
+                    <div class="terminal-input-row">
+                        <span class="terminal-prompt" id="terminalPrompt">$</span>
+                        <input type="text" id="terminalInput" placeholder="输入 ADB 命令 (如: shell pm list packages)" onkeypress="handleTerminalKey(event)">
+                        <button onclick="executeTerminalCommand()">执行</button>
+                    </div>
+                    <div class="terminal-hint">提示: 直接输入命令，如 <code>shell ls /sdcard/</code> 或 <code>pm list packages</code></div>
+                </div>
+            </div>
+        </div>
+
         <!-- App Config Backup & Restore Section -->
         <div class="panel app-config-panel" id="panel-config">
             <div class="panel-header" onclick="togglePanel('panel-config')">
-                <div class="panel-title">💾 APP配置备份与批量恢复</div>
+                <div class="panel-title">APP配置备份与批量恢复</div>
                 <button class="panel-toggle">▼</button>
             </div>
             <div class="panel-content">
@@ -1612,28 +1634,6 @@
                     <textarea id="restoreLog" class="log-area" style="height: 100px;" readonly placeholder="恢复日志将显示在这里..."></textarea>
                 </div>
             </div>
-            </div>
-        </div>
-
-        <!-- ADB Command Terminal Section -->
-        <div class="panel adb-terminal-panel" id="panel-terminal">
-            <div class="panel-header" onclick="togglePanel('panel-terminal')">
-                <div class="panel-title">🔧 ADB 命令行</div>
-                <button class="panel-toggle">▼</button>
-            </div>
-            <div class="panel-content">
-                <div class="terminal-container">
-                    <div class="terminal-output" id="terminalOutput">
-                        <div class="terminal-line system">欢迎使用 ADB 命令行 - 选择设备后输入命令执行</div>
-                    </div>
-                    <div class="terminal-input-row">
-                        <span class="terminal-prompt" id="terminalPrompt">$</span>
-                        <input type="text" id="terminalInput" placeholder="输入 ADB 命令 (如: shell pm list packages)" onkeypress="handleTerminalKey(event)">
-                        <button onclick="executeTerminalCommand()">执行</button>
-                        <button onclick="openAdbShell()" style="background: #f59e0b; margin-left: 8px;">CMD</button>
-                    </div>
-                    <div class="terminal-hint">提示: 直接输入命令，如 <code>shell ls /sdcard/</code> 或 <code>pm list packages</code></div>
-                </div>
             </div>
         </div>
 
@@ -1705,15 +1705,40 @@
                 const path = await invoke('find_adb');
                 const adbPathEl = document.getElementById('adbPath');
                 if (path) {
-                    adbPathEl.textContent = '已就绪（内嵌ADB）';
+                    adbPathEl.textContent = path;
                     adbPathEl.className = 'adb-path set';
                     await refreshDevices();
                 } else {
-                    adbPathEl.textContent = 'ADB初始化失败';
+                    adbPathEl.textContent = '未找到ADB，请手动设置';
                     adbPathEl.className = 'adb-path error';
                 }
             } catch (error) {
                 console.error('Error checking ADB:', error);
+            }
+        }
+
+        // Set ADB Path
+        async function setAdbPath() {
+            try {
+                const selected = await dialog.open({
+                    title: '选择adb.exe文件',
+                    filters: [{ name: 'ADB Executable', extensions: ['exe'] }]
+                });
+                if (selected) {
+                    const path = Array.isArray(selected) ? selected[0] : selected;
+                    console.log('Selected path:', path);
+                    const success = await invoke('set_adb_path', { path: path });
+                    console.log('Set ADB path result:', success);
+                    if (success) {
+                        await checkAdb();
+                        alert('ADB路径已设置:\n' + path);
+                    } else {
+                        alert('无效的文件路径，请确认选择的是adb.exe文件');
+                    }
+                }
+            } catch (error) {
+                console.error('Error setting ADB path:', error);
+                alert('设置ADB路径时出错:\n' + error);
             }
         }
 
@@ -1825,7 +1850,6 @@
         async function refreshDevices() {
             devices = await invoke('get_devices');
             selectedDevices = [];
-            document.getElementById('selectAllCheckbox').checked = false;
             renderDeviceTable();
             updateButtonStates();
             updateDeviceStatus();
@@ -2308,14 +2332,15 @@
             const selectAllCheckbox = document.getElementById('selectAllCheckbox');
             const checkboxes = document.querySelectorAll('#deviceTableBody input[type="checkbox"]');
             
-            if (selectAllCheckbox.checked) {
-                selectedDevices = [...devices];
-            } else {
-                selectedDevices = [];
-            }
-            
             checkboxes.forEach((checkbox, index) => {
                 checkbox.checked = selectAllCheckbox.checked;
+                if (selectAllCheckbox.checked) {
+                    if (!selectedDevices.includes(devices[index])) {
+                        selectedDevices.push(devices[index]);
+                    }
+                } else {
+                    selectedDevices = [];
+                }
             });
             
             updateButtonStates();
@@ -3242,7 +3267,7 @@
             console.log('DOM loaded, initializing...');
             initTheme();
             initPanelStates();
-            checkAdb();
+            findAdb();
             refreshDevices();
         });
 
@@ -3301,25 +3326,6 @@
                 }
             } catch (error) {
                 addTerminalLine(`错误: ${error}`, 'error');
-            }
-        }
-
-        async function openAdbShell() {
-            const onlineDevices = selectedDevices.filter(d => d.status === 'device');
-            if (onlineDevices.length !== 1) {
-                alert('请先选择一台设备');
-                return;
-            }
-
-            const deviceId = onlineDevices[0].device_id;
-
-            try {
-                const result = await invoke('open_adb_shell', { deviceId });
-                if (!result.success) {
-                    alert(result.output);
-                }
-            } catch (error) {
-                alert('打开Shell失败: ' + error);
             }
         }
     </script>
